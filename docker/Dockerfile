@@ -7,7 +7,7 @@ ENV HOME=/home/${USER_NAME} \
 ENV \
   PYTHONUNBUFFERED=1 \
   DEBIAN_FRONTEND=noninteractive \
-  TZ=Europe/Warsaw \
+  TZ=EAmerica/New_York \
   PATH="/usr/local/gcloud/google-cloud-sdk/bin:${HOME}/.local/bin:${VIRTUAL_ENV}/bin:${PATH}" \
   PYTHONPATH="/app:${PYTHONPATH}" \
   BUILD_POETRY_LOCK="${HOME}/poetry.lock.build"
@@ -45,6 +45,11 @@ USER root
 COPY ./docker/scripts/* /
 RUN chown -R ${USER_NAME} /*.sh && chmod +x /*.sh
 USER ${USER_NAME}
+
+RUN git config --global user.email "ajohnson0764@gmail.com"\
+    && git config --global user.name "ajohnson114"
+
+RUN python3.10 -m nltk.downloader stopwords && python3.10 -m nltk.downloader punkt
 
 COPY . /app/
 CMD ["/startup-script.sh"]
