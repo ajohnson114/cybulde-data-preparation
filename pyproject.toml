@@ -28,6 +28,16 @@ black = "~=23.3"
 isort = "~=5.12"
 flake8 = "~=6.0"
 mypy = "~=1.2"
+jupyterlab = "~=4.0"
+
+types-PyYAML = "~=6.0.12.12"
+types-decorator = "~=5.1.8.20240106"
+types-protobuf = "~=4.24.0.20240106"
+types-pyOpenSSL = "~=23.3.0.20240106" 
+types-pycurl = "~=7.45.2.20240106"
+types-requests = "~=2.31.0.20240106"
+types-setuptools = "~=69.0.0.20240106"
+types-six = "~=1.16.21.20240106"
 
 [build-system]
 requires = ["poetry-core"]

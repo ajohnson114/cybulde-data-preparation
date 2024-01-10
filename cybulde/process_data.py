@@ -1,24 +1,39 @@
-from cybulde.config_schemas.config_schema import Config
-from cybulde.utils.config_utils import get_config
-from cybulde.utils.gcp_utils import access_secret_version
-from cybulde.utils.data_utils import get_raw_data_with_version
+from hydra.utils import instantiate
 
-@get_config(config_path="../configs", config_name="config")
-def process_data(config: Config) -> None:
-    print(config)
-    version = "1"
-    data_local_save_dir = "./data/raw"
-    dvc_remote_repo = "https://github.com/ajohnson114/ML_GCP.git"
-    dvc_data_folder = "./data/raw"
-    github_user_name = "ajohnson114"
-    github_access_token = access_secret_version("ml-apps-409905", "cybulde-data-github-access-token")
-    
-    get_raw_data_with_version(version,
-                              data_local_save_dir,
-                              dvc_remote_repo,
-                              dvc_data_folder,
-                              github_user_name,
-                              github_access_token)
+from cybulde.config_schemas.infrastructure.data_processing_config_schema import DataProcessingConfig
+from cybulde.utils.config_utils import get_config
+from cybulde.utils.data_utils import get_raw_data_with_version
+from cybulde.utils.gcp_utils import access_secret_version
+
+
+@get_config(config_path="../configs", config_name="data_processing_config")
+def process_data(config: DataProcessingConfig) -> None:
+    # print(config)
+
+    github_access_token = access_secret_version(config.infrastructure.project_id, config.github_access_token_secret_id)
+
+    get_raw_data_with_version(
+        config.version,
+        config.data_local_save_dir,
+        config.dvc_remote_repo,
+        config.dvc_data_folder,
+        config.github_user_name,
+        github_access_token,
+    )
+
+    dataset_reader_manager = instantiate(config.dataset_reader_manager)
+    dataset_cleaner_manager = instantiate(config.dataset_cleaner_manager)
+    df = dataset_reader_manager.read_data().compute()
+    sample_df = df.sample(n=5)
+
+    for _, row in sample_df.iterrows():
+        text = row["text"]
+        cleaned_text = dataset_cleaner_manager(text)
+        print(60 * "*")
+        print(f"{text = }")
+        print(f"{cleaned_text = }")
+        print(60 * "*")
+
 
 if __name__ == "__main__":
-    process_data()  # type: ignore
+    process_data()
