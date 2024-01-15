@@ -5,6 +5,8 @@ from pydantic.dataclasses import dataclass
 @dataclass
 class GCPConfig:
     project_id: str = "ml-apps-409905"
+    zone: str = "us-east4-a"
+    network: str = "default"
 
 
 def setup_config() -> None:

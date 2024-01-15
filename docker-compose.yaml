@@ -6,6 +6,8 @@ services:
     hostname: "${HOST_NAME:-andrew}"
     image: cybulde-data-preparation
     container_name: cybulde-data-preparation-container
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=./creds/ml-apps-409905-be3082008c87.json
     build:
       context: .
       dockerfile: ./docker/Dockerfile

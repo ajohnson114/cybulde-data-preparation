@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM --platform=linux/amd64 python:3.10-slim
 
 ARG USER_ID
 ARG USER_NAME
@@ -7,13 +7,13 @@ ENV HOME=/home/${USER_NAME} \
 ENV \
   PYTHONUNBUFFERED=1 \
   DEBIAN_FRONTEND=noninteractive \
-  TZ=EAmerica/New_York \
+  TZ=America/New_York \
   PATH="/usr/local/gcloud/google-cloud-sdk/bin:${HOME}/.local/bin:${VIRTUAL_ENV}/bin:${PATH}" \
   PYTHONPATH="/app:${PYTHONPATH}" \
   BUILD_POETRY_LOCK="${HOME}/poetry.lock.build"
 
 RUN apt-get -qq update \
-    && apt-get -qq -y install vim gcc curl git build-essential libb64-dev software-properties-common \
+    && apt-get -qq -y install vim gcc curl git build-essential libb64-dev software-properties-common htop \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get -qq -y clean
 
