@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 python:3.10-slim
+FROM python:3.10-slim
 
 ARG USER_ID
 ARG USER_NAME
@@ -17,8 +17,9 @@ RUN apt-get -qq update \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get -qq -y clean
 
-RUN curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-426.0.0-linux-x86_64.tar.gz > /tmp/google-cloud-sdk.tar.gz
-RUN mkdir -p /usr/local/gcloud \
+RUN GCLOUD_ARCH=$([ "$(uname -m)" = "aarch64" ] && echo "arm" || echo "x86_64") \
+    && curl "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-426.0.0-linux-${GCLOUD_ARCH}.tar.gz" > /tmp/google-cloud-sdk.tar.gz \
+    && mkdir -p /usr/local/gcloud \
     && tar -C /usr/local/gcloud -xf /tmp/google-cloud-sdk.tar.gz \
     && /usr/local/gcloud/google-cloud-sdk/install.sh --usage-reporting false --command-completion true --bash-completion true --path-update true --quiet
 

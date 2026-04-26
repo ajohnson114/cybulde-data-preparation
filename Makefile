@@ -44,13 +44,17 @@ process-data: generate-final-data-processing-config push
 	$(DOCKER_COMPOSE_EXEC) python ./cybulde/process_data.py
 
 ## Processes raw data locally and doesn't push to Artifact Registry
-local-process-data: generate-final-data-processing-config 
+local-process-data: up
+	$(DOCKER_COMPOSE_EXEC) python ./cybulde/generate_final_config.py --config-name data_processing_config --overrides +running_mode=local docker_image_name=$(LOCAL_DOCKER_IMAGE_NAME) docker_image_tag=local $${OVERRIDES}
 	$(DOCKER_COMPOSE_EXEC) python ./cybulde/process_data.py
 
-## Push docker image to GCP artifact registry
-push: build
+## Push docker image to GCP artifact registry (always builds linux/amd64 for GCP workers)
+push:
+	DOCKER_BUILDKIT=1 docker build --platform linux/amd64 \
+		--build-arg USER_NAME=$(USER_NAME) --build-arg USER_ID=$(USER_ID) \
+		-t $(GCP_DOCKER_IMAGE_NAME):$(GCP_DOCKER_IMAGE_TAG) \
+		-f ./docker/Dockerfile .
 	gcloud auth configure-docker --quiet us-east4-docker.pkg.dev
-	docker tag $(LOCAL_DOCKER_IMAGE_NAME):latest $(GCP_DOCKER_IMAGE_NAME):"$${GCP_DOCKER_IMAGE_TAG}"
 	docker push $(GCP_DOCKER_IMAGE_NAME):$(GCP_DOCKER_IMAGE_TAG)
 
 ## Starts jupyter lab
